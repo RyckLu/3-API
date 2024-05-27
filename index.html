@@ -6,13 +6,40 @@
     <title>CEP-São Paulo</title>
 </head>
 <body>
-    
+    <h1>Consulta de CEP - São Paulo</h1>
+    <form onsubmit="event.preventDefault(); consultarCEP();">
+        <label for="cep">Digite o CEP:</label>
+        <input type="text" id="cep" name="cep" required>
+        <button type="submit">Consultar</button>
+    </form>
+    <div id="resultado"></div>
     <script>
-        function consultarCEP(){
+       async function consultarCEP() {
             const cep = document.getElementById("cep").value;
             const url = `https://viacep.com.br/ws/${cep}/json/`;
-            
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.erro) {
+                    document.getElementById("resultado").innerHTML = "CEP inválido.";
+                } else if (data.uf === "SP") {
+                    document.getElementById("resultado").innerHTML = `
+                        <p><strong>Endereço:</strong> ${data.logradouro}</p>
+                        <p><strong>Bairro:</strong> ${data.bairro}</p>
+                        <p><strong>Cidade:</strong> ${data.localidade}</p>
+                        <p><strong>Estado:</strong> ${data.uf}</p>
+                    `;
+                } else {
+                    document.getElementById("resultado").innerHTML = "O CEP não pertence ao estado de São Paulo.";
+                }
+            } catch (error) {
+                document.getElementById("resultado").innerHTML = "Erro ao consultar o CEP.";
+                console.error("Erro ao consultar o CEP:", error);
+            }
         }
+    </script>
     </script>
 </body>
 </html>
